@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model bookings {
+  id                  Int                   @id @default(autoincrement())
+  lastname            String                @db.VarChar(255)
+  firstname           String                @db.VarChar(255)
+  email               String                @db.VarChar(255)
+  phone               String                @db.VarChar(255)
+  start_date          DateTime              @db.Date
+  end_date            DateTime              @db.Date
+  room_id             Int
+  created_at          DateTime              @db.DateTime(0)
+  updated_at          DateTime              @db.DateTime(0)
+  rooms               rooms                 @relation(fields: [room_id], references: [id], onUpdate: Restrict, map: "bookings_rooms_fk")
+  room_types_bookings room_types_bookings[]
+
+  @@index([room_id], map: "bookings_rooms_fk")
+}
+
+model collaborators {
+  id         Int      @id @default(autoincrement())
+  lastname   String   @db.VarChar(255)
+  firstname  String   @db.VarChar(255)
+  email      String   @db.VarChar(255)
+  password   String   @db.VarChar(255)
+  phone      String   @db.VarChar(255)
+  function   String   @db.VarChar(255)
+  role       String   @db.VarChar(255)
+  hotel_id   Int
+  created_at DateTime @default(now()) @db.DateTime(0)
+  updated_at DateTime @default(now()) @db.DateTime(0)
+  hotels     hotels   @relation(fields: [hotel_id], references: [id], onUpdate: Restrict, map: "collaborator_hotel_fk")
+
+  @@index([hotel_id], map: "collaborator_hotel_fk")
+}
+
+model hotels {
+  id            Int             @id @default(autoincrement())
+  code          String          @db.VarChar(255)
+  city          String          @db.VarChar(255)
+  address       String          @db.VarChar(255)
+  reference     String          @db.VarChar(255)
+  created_at    DateTime        @default(now()) @db.DateTime(0)
+  updated_at    DateTime        @default(now()) @db.DateTime(0)
+  collaborators collaborators[]
+  room_options  room_options[]
+  rooms         rooms[]
+}
+
+model room_options {
+  id                  Int                   @id @default(autoincrement())
+  label               String                @db.VarChar(255)
+  description         String                @db.Text
+  price               Float
+  hotel_id            Int
+  created_at          DateTime              @default(now()) @db.DateTime(0)
+  updated_at          DateTime              @default(now()) @db.DateTime(0)
+  hotels              hotels                @relation(fields: [hotel_id], references: [id], onUpdate: Restrict, map: "room_option_hotel_fk")
+  room_types_bookings room_types_bookings[]
+
+  @@index([hotel_id], map: "room_option_hotel_fk")
+}
+
+model room_types {
+  id          Int      @id @default(autoincrement())
+  label       String   @db.VarChar(255)
+  price       Float
+  description String   @db.Text
+  created_at  DateTime @default(now()) @db.DateTime(0)
+  update_at   DateTime @default(now()) @db.DateTime(0)
+  rooms       rooms[]
+}
+
+model room_types_bookings {
+  id             Int          @id @default(autoincrement())
+  room_option_id Int
+  booking_id     Int
+  quantity       Int
+  created_at     DateTime     @default(now()) @db.DateTime(0)
+  updated_at     DateTime     @default(now()) @db.DateTime(0)
+  bookings       bookings     @relation(fields: [booking_id], references: [id], onUpdate: Restrict, map: "room_type_booking_fk")
+  room_options   room_options @relation(fields: [room_option_id], references: [id], onUpdate: Restrict, map: "room_type_room_option_fk")
+
+  @@index([booking_id], map: "room_type_booking_fk")
+  @@index([room_option_id], map: "room_type_room_option_fk")
+}
+
+model rooms {
+  id           Int        @id @default(autoincrement())
+  number       Int
+  floor        Int
+  hotel_id     Int
+  room_type_id Int
+  created_at   DateTime   @default(now()) @db.DateTime(0)
+  updated_at   DateTime   @default(now()) @db.DateTime(0)
+  bookings     bookings[]
+  hotels       hotels     @relation(fields: [hotel_id], references: [id], onUpdate: Restrict, map: "room_hotel_fk")
+  room_types   room_types @relation(fields: [room_type_id], references: [id], onUpdate: Restrict, map: "room_room_type_fk")
+
+  @@index([hotel_id], map: "room_hotel_fk")
+  @@index([room_type_id], map: "room_room_type_fk")
+}

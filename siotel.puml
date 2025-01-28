@@ -1,0 +1,80 @@
+@startuml
+entity Hotels {
+    id : PK A_I
+    code : varchar
+    city : varchar
+    address : varchar
+    manager_id : FK users
+    capacity : int
+    is_open : boolean
+    created_at : Datetime now
+    updated_at : Datetime now
+}
+
+entity Rooms {
+    id : PK A_I
+    number : int
+    capacity : int
+    theme : varchar null
+    price : double
+    hotel_id : FK hotels
+    created_at : Datetime now
+    updated_at : Datetime now
+}
+
+entity Users {
+    id : PK A_I
+    lastname : varchar
+    firstname : varchar
+    email : varchar
+    phone : varchar
+    password : varchar
+    function_id : FK user_functions
+    hotel_id : FK hotels
+    created_at : Datetime now
+    updated_at : Datetime now
+}
+
+entity User_functions {
+    id : PK A_I
+    label : varchar
+}
+
+entity Bookings {
+    id : PK A_I
+    lastname : varchar
+    firstname : varchar
+    email : varchar
+    phone : varchar
+    start_date : Date
+    end_date : Date
+    room_id : FK rooms
+    created_at : Datetime now
+    updated_at : Datetime now
+}
+
+entity Booking_options {
+    id : PK A_I
+    label : varchar
+    description : text
+    price : double
+    created_at : Datetime now
+    updated_at : Datetime now
+}
+
+entity Booking_booking_option {
+    id : PK A_I
+    booking_id : FK bookings
+    booking_option_id : FK booking_options
+    quantity : int default 1
+    created_at : Datetime now
+    updated_at : Datetime now
+}
+
+Hotels }|--|| Rooms
+Hotels ||--|| Users
+Rooms }o--|| Bookings
+Users ||--o{ User_functions
+Bookings }o--|| Booking_booking_option
+Booking_options }o--|| Booking_booking_option
+@enduml

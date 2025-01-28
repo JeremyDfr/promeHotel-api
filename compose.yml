@@ -1,0 +1,30 @@
+services:
+  api:
+    image: node:22-alpine
+    volumes:
+      - ./:/api
+    working_dir: /api
+    ports:
+      - 3000:3000
+    command: npm run setup
+
+  database:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data:/var/lib/mysql
+      - ./tokyohotel.sql:/docker-entrypoint-initdb.d/tokyohotel.sql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=tokyohotel
+      - MYSQL_USER=tokyohotel
+      - MYSQL_PASSWORD=tokyohotel
+
+  phpmyadmin:
+    image: phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      - PMA_HOST=database
+      - UPLOAD_LIMIT=50G
